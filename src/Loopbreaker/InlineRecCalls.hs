@@ -1,4 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 module Loopbreaker.InlineRecCalls (action) where
 
@@ -14,9 +16,17 @@ import qualified Data.Set as S
 import Bag
 import ErrUtils
 import GhcPlugins hiding ((<>), debugTraceMsg)
-import HsSyn
 import MonadUtils
+#if __GLASGOW_HASKELL__ <= 808
+import HsSyn
+#else
+import GHC.Hs
 
+type NoExt = NoExtField
+
+pattern NoExt :: NoExtField
+pattern NoExt = NoExtField
+#endif
 
 ------------------------------------------------------------------------------
 type MonadInline m = ((MonadUnique m, MonadIO m, HasDynFlags m) :: Constraint)
